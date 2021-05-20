@@ -25,7 +25,7 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    @PostMapping
+    @PostMapping(produces="application/json")
     public ResponseEntity<?> createPlayer(@RequestBody Player player){
         if (player.getName() == null || player.getTitle() == null || player.getRace() == null ||
         player.getProfession() == null || player.getBirthday() == null || player.getExperience() == null){
@@ -48,8 +48,11 @@ public class PlayerController {
         if (calendar.get(Calendar.YEAR) < 2000 || calendar.get(Calendar.YEAR) > 3000){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        if (player.getBanned() == null){
+            player.setBanned(false);
+        }
         playerService.create(player);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(player, HttpStatus.OK);
     }
 
     @GetMapping
