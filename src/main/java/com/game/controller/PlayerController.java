@@ -25,33 +25,10 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    @PostMapping(produces="application/json")
+    @PostMapping
     public ResponseEntity<?> createPlayer(@RequestBody Player player){
-        if (player.getName() == null || player.getTitle() == null || player.getRace() == null ||
-        player.getProfession() == null || player.getBirthday() == null || player.getExperience() == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (player.getName().length() > 12 || player.getTitle().length() > 30){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (player.getName().equals("")){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (player.getExperience() < 0 || player.getExperience() > 10_000_000){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (player.getBirthday().getTime() < 0){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(player.getBirthday());
-        if (calendar.get(Calendar.YEAR) < 2000 || calendar.get(Calendar.YEAR) > 3000){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (player.getBanned() == null){
-            player.setBanned(false);
-        }
-        playerService.create(player);
+        Player createPlayer = playerService.create(player);
+        if (createPlayer == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(player, HttpStatus.OK);
     }
 

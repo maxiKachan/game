@@ -3,6 +3,8 @@ package com.game.service;
 import com.game.entity.Player;
 import com.game.repository.PlayerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,6 +17,31 @@ public class PlayerServiceImpl implements PlayerService{
 
     @Override
     public Player create(Player player) {
+        if (player.getName() == null || player.getTitle() == null || player.getRace() == null ||
+                player.getProfession() == null || player.getBirthday() == null || player.getExperience() == null ||
+        player.getName().isEmpty()){
+            return null;
+        }
+        if (player.getName().length() > 12 || player.getTitle().length() > 30){
+            return null;
+        }
+        if (player.getName().equals("")){
+            return null;
+        }
+        if (player.getExperience() < 0 || player.getExperience() > 10_000_000){
+            return null;
+        }
+        if (player.getBirthday().getTime() < 0){
+            return null;
+        }
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(player.getBirthday());
+        if (calendar.get(Calendar.YEAR) < 2000 || calendar.get(Calendar.YEAR) > 3000){
+            return null;
+        }
+        if (player.getBanned() == null){
+            player.setBanned(false);
+        }
         player.setLevel(countLevel(player.getExperience()));
         player.setUntilNextLevel(countUntilNextLevel(player.getLevel(), player.getExperience()));
         if (player.getBanned() == null) {
