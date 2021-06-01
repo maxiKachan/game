@@ -3,11 +3,11 @@ package com.game.service;
 import com.game.entity.Player;
 import com.game.repository.PlayerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class PlayerServiceImpl implements PlayerService{
@@ -54,7 +54,7 @@ public class PlayerServiceImpl implements PlayerService{
     @Override
     public Player get(Long id) {
         if (playerRepo.existsById(id)){
-            return playerRepo.findById(id).get();
+            return playerRepo.findById(id).orElse(null);
         }
         return null;
     }
@@ -116,9 +116,29 @@ public class PlayerServiceImpl implements PlayerService{
     public List<Player> getList() {
         Iterable<Player> iterPlayer = playerRepo.findAll();
         List<Player> players = new ArrayList<>();
-        for (Player player : iterPlayer) {
-            players.add(player);
-        }
+        iterPlayer.forEach(players :: add);
+
         return players;
+    }
+
+    @Override
+    public List<Player> getListWithFilter(Map<String, String> map) {
+        List<Player> listWithFilter = getList();
+
+        if (map.containsKey("name")){
+            String findByName = map.get("name");
+            Iterator<Player> playerIterator = listWithFilter.iterator();
+            Pattern pattern = Pattern.compile(findByName.toLowerCase());
+            while (playerIterator.hasNext()){
+                Player nextPlayer = playerIterator.next();
+                String lowName = nextPlayer.getName().toLowerCase();
+                Matcher matcher = pattern.matcher(lowName);
+                if (!matcher.find()){
+                    playerIterator.remove();
+                }
+            }
+        }
+
+        return listWithFilter;
     }
 }

@@ -3,6 +3,7 @@ package com.game.service;
 import com.game.entity.Player;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PlayerService {
 
@@ -15,4 +16,6 @@ public interface PlayerService {
     boolean delete(Long id);
 
     List<Player> getList();
+
+    List<Player> getListWithFilter(Map<String, String> map);
 }

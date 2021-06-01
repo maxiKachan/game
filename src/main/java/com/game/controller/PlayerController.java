@@ -36,28 +36,18 @@ public class PlayerController {
     public ResponseEntity<List<Player>> getList(@RequestParam Map<String, String> map){
         int pageNumber = 0;
         int pageSize = 3;
-        PlayerOrder playerOrder = PlayerOrder.ID;
-        List<Player> responsePlayers = new ArrayList<>();
-        List<Player> players = playerService.getList();
 
-        if (map.containsKey("name")){
-            String findByName = map.get("name");
-            Iterator<Player> playerIterator = players.iterator();
-            Pattern pattern = Pattern.compile(findByName.toLowerCase());
-            System.out.println("nen");
-            while (playerIterator.hasNext()){
-                Player nextPlayer = playerIterator.next();
-                String lowName = nextPlayer.getName().toLowerCase();
-                Matcher matcher = pattern.matcher(lowName);
-                if (!matcher.find()){
-                        playerIterator.remove();
-                }
-            }
+        PlayerOrder playerOrder = PlayerOrder.ID;
+        List<Player> filteredPlayers;
+        if (map.isEmpty()) {
+            filteredPlayers = playerService.getList();
+        } else {
+            filteredPlayers = playerService.getListWithFilter(map);
         }
 
         if (map.containsKey("title")){
             String findByTitle = map.get("title");
-            Iterator<Player> playerIterator = players.iterator();
+            Iterator<Player> playerIterator = filteredPlayers.iterator();
             Pattern pattern = Pattern.compile(findByTitle.toLowerCase());
             while (playerIterator.hasNext()){
                 Player nextPlayer = playerIterator.next();
@@ -87,7 +77,7 @@ public class PlayerController {
                 break;
                 default: searchRace = Race.HOBBIT;
             }
-            Iterator<Player> playerIterator = players.iterator();
+            Iterator<Player> playerIterator = filteredPlayers.iterator();
             while (playerIterator.hasNext()){
                 Player player = playerIterator.next();
                 if (player.getRace() != searchRace){
@@ -116,7 +106,7 @@ public class PlayerController {
                 break;
                 default: searchProfession = Profession.DRUID;
             }
-            Iterator<Player> playerIterator = players.iterator();
+            Iterator<Player> playerIterator = filteredPlayers.iterator();
             while (playerIterator.hasNext()){
                 Player player = playerIterator.next();
                 if (player.getProfession() != searchProfession){
@@ -128,7 +118,7 @@ public class PlayerController {
         if (map.containsKey("after")){
             String afterBirthday = map.get("after");
             long afterTime = Long.parseLong(afterBirthday);
-            Iterator<Player> playerIterator = players.iterator();
+            Iterator<Player> playerIterator = filteredPlayers.iterator();
             while (playerIterator.hasNext()){
                 Player player = playerIterator.next();
                 if (player.getBirthday().getTime() < afterTime){
@@ -140,7 +130,7 @@ public class PlayerController {
         if (map.containsKey("before")){
             String before = map.get("before");
             long beforeTime = Long.parseLong(before);
-            Iterator<Player> playerIterator = players.iterator();
+            Iterator<Player> playerIterator = filteredPlayers.iterator();
             while (playerIterator.hasNext()){
                 Player player = playerIterator.next();
                 if (player.getBirthday().getTime() > beforeTime){
@@ -152,7 +142,7 @@ public class PlayerController {
         if (map.containsKey("minExperience")){
             String sMinExperience = map.get("minExperience");
             int minExperience = Integer.parseInt(sMinExperience);
-            Iterator<Player> playerIterator = players.iterator();
+            Iterator<Player> playerIterator = filteredPlayers.iterator();
             while (playerIterator.hasNext()){
                 Player player = playerIterator.next();
                 if (player.getExperience() < minExperience){
@@ -164,7 +154,7 @@ public class PlayerController {
         if (map.containsKey("maxExperience")){
             String sMaxExperience = map.get("maxExperience");
             int maxExperience = Integer.parseInt(sMaxExperience);
-            Iterator<Player> playerIterator = players.iterator();
+            Iterator<Player> playerIterator = filteredPlayers.iterator();
             while (playerIterator.hasNext()){
                 Player player = playerIterator.next();
                 if (player.getExperience() > maxExperience){
@@ -176,7 +166,7 @@ public class PlayerController {
         if (map.containsKey("minLevel")){
             String sMinLevel = map.get("minLevel");
             int minLevel = Integer.parseInt(sMinLevel);
-            Iterator<Player> playerIterator = players.iterator();
+            Iterator<Player> playerIterator = filteredPlayers.iterator();
             while (playerIterator.hasNext()){
                 Player player = playerIterator.next();
                 if (player.getLevel() < minLevel){
@@ -188,7 +178,7 @@ public class PlayerController {
         if (map.containsKey("maxLevel")){
             String sMaxLevel = map.get("maxLevel");
             int maxLevel = Integer.parseInt(sMaxLevel);
-            Iterator<Player> playerIterator = players.iterator();
+            Iterator<Player> playerIterator = filteredPlayers.iterator();
             while (playerIterator.hasNext()){
                 Player player = playerIterator.next();
                 if (player.getLevel() > maxLevel){
@@ -200,7 +190,7 @@ public class PlayerController {
         if (map.containsKey("banned")){
             String sBanned = map.get("banned");
             boolean banned = Boolean.parseBoolean(sBanned);
-            Iterator<Player> playerIterator = players.iterator();
+            Iterator<Player> playerIterator = filteredPlayers.iterator();
             while (playerIterator.hasNext()){
                 Player player = playerIterator.next();
                 if (player.getBanned() != banned){
@@ -229,9 +219,11 @@ public class PlayerController {
         if (map.containsKey("pageSize")){
             pageSize = Integer.parseInt(map.get("pageSize"));
         }
+
+        List<Player> responsePlayers = new ArrayList<>();
         for (int i = pageNumber*pageSize + 1; i < pageNumber*pageSize + 1 + pageSize; i++){
-            if (i <= players.size()) {
-                responsePlayers.add(players.get(i - 1));
+            if (i <= filteredPlayers.size()) {
+                responsePlayers.add(filteredPlayers.get(i - 1));
             }
         }
         return new ResponseEntity<>(responsePlayers, HttpStatus.OK);
