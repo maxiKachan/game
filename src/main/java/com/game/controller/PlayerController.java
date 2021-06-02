@@ -45,20 +45,6 @@ public class PlayerController {
             filteredPlayers = playerService.getListWithFilter(map);
         }
 
-        if (map.containsKey("title")){
-            String findByTitle = map.get("title");
-            Iterator<Player> playerIterator = filteredPlayers.iterator();
-            Pattern pattern = Pattern.compile(findByTitle.toLowerCase());
-            while (playerIterator.hasNext()){
-                Player nextPlayer = playerIterator.next();
-                String lowTitle = nextPlayer.getTitle().toLowerCase();
-                Matcher matcher = pattern.matcher(lowTitle);
-                if (!matcher.find()){
-                        playerIterator.remove();
-                }
-            }
-        }
-
         if (map.containsKey("race")){
             Race searchRace;
             String race = map.get("race");

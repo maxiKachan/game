@@ -126,19 +126,30 @@ public class PlayerServiceImpl implements PlayerService{
         List<Player> listWithFilter = getList();
 
         if (map.containsKey("name")){
-            String findByName = map.get("name");
-            Iterator<Player> playerIterator = listWithFilter.iterator();
-            Pattern pattern = Pattern.compile(findByName.toLowerCase());
-            while (playerIterator.hasNext()){
-                Player nextPlayer = playerIterator.next();
-                String lowName = nextPlayer.getName().toLowerCase();
-                Matcher matcher = pattern.matcher(lowName);
-                if (!matcher.find()){
+            getListWithNameAndTitleFilter(map.get("name"),"name", listWithFilter);
+        }
+
+        if (map.containsKey("title")){
+            getListWithNameAndTitleFilter(map.get("title"), "title", listWithFilter);
+        }
+
+        return listWithFilter;
+    }
+
+    private void getListWithNameAndTitleFilter(String filter,String changer, List<Player> players){
+        Iterator<Player> playerIterator = players.iterator();
+        Pattern pattern = Pattern.compile(filter.toLowerCase());
+
+        while (playerIterator.hasNext()){
+            if (changer.equals("name")) {
+                if (!pattern.matcher(playerIterator.next().getName().toLowerCase()).find()) {
+                    playerIterator.remove();
+                }
+            } else if (changer.equals("title")){
+                if (!pattern.matcher(playerIterator.next().getTitle().toLowerCase()).find()) {
                     playerIterator.remove();
                 }
             }
         }
-
-        return listWithFilter;
     }
 }
