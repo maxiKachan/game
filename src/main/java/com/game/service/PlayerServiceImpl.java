@@ -125,8 +125,10 @@ public class PlayerServiceImpl implements PlayerService{
 
     @Override
     public List<Player> getListWithFilter(Map<String, String> map) {
-        List<Player> listWithFilter = getList();
+        int pageNumber = 0;
+        int pageSize = 3;
 
+        List<Player> listWithFilter = getList();
         if (map.containsKey("name")){
             getListWithNameAndTitleFilter(map.get("name"),"name", listWithFilter);
         }
@@ -165,6 +167,10 @@ public class PlayerServiceImpl implements PlayerService{
 
         if (map.containsKey("maxLevel")){
             getListWithOtherFilter("maxLevel", listWithFilter, Long.parseLong(map.get("maxLevel")));
+        }
+
+        if (map.containsKey("banned")){
+            getListWithBannedFilter(map.get("banned"), listWithFilter);
         }
 
         return listWithFilter;
@@ -250,5 +256,10 @@ public class PlayerServiceImpl implements PlayerService{
                 players.removeIf(player -> player.getLevel() > value);
                 break;
         }
+    }
+
+    private void getListWithBannedFilter(String filter, List<Player> players){
+        boolean banned = Boolean.parseBoolean(filter);
+        players.removeIf(player -> player.getBanned() != banned);
     }
 }

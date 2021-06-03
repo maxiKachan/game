@@ -45,18 +45,6 @@ public class PlayerController {
             filteredPlayers = playerService.getListWithFilter(map);
         }
 
-        if (map.containsKey("banned")){
-            String sBanned = map.get("banned");
-            boolean banned = Boolean.parseBoolean(sBanned);
-            Iterator<Player> playerIterator = filteredPlayers.iterator();
-            while (playerIterator.hasNext()){
-                Player player = playerIterator.next();
-                if (player.getBanned() != banned){
-                    playerIterator.remove();
-                }
-            }
-        }
-
         if (map.containsKey("order")){
             String stringOrder = map.get("order");
             switch (stringOrder.toUpperCase()){
